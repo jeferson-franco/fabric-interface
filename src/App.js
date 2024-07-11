@@ -1,24 +1,46 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { Container, Typography } from '@mui/material';
+import axios from 'axios';
+import Form from './components/Form';
+import Response from './components/Response';
 import './App.css';
 
 function App() {
+  const [text, setText] = useState('');
+  const [response, setResponse] = useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const res = await axios.post(
+        'localhost',
+        {
+          text: text,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer YOUR_OPEN_API_KEY',
+          },
+        },
+      );
+
+      setResponse(res.data.response);
+    } catch (error) {
+      console.error('Error:', error);
+      setResponse('Error fetching data');
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container className="mt-10">
+      <Typography variant="h4" gutterBottom>
+        Fabric Interface
+      </Typography>
+      <Form text={text} setText={setText} handleSubmit={handleSubmit} />
+      {response && <Response response={response} />}
+    </Container>
   );
 }
 
